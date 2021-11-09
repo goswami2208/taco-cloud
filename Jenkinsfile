@@ -1,9 +1,13 @@
 pipeline {
-    agent {
+    /* agent {
         docker {
             image 'maven:3.8.1-adoptopenjdk-11'
             args '-v /root/.m2:/root/.m2'
         }
+    } */
+    agent any
+        tools {
+            maven 'apache-maven-3.8.3'
     }
     environment {
         DATE = new Date().format('yy.M')
