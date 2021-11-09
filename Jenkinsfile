@@ -48,7 +48,7 @@ pipeline {
         }
         stage('Deploy'){
             steps {
-                sh "docker run --name taco-cloud -d -p 8081:8081 joygoswami/taco-cloud:${TAG}"
+                sh "docker run --name taco-cloud -d -p 8081:8080 joygoswami/taco-cloud:${TAG}"
             }
         }
     }
