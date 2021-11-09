@@ -21,5 +21,11 @@ pipeline {
                 }
             }
         }
+        stage ('Docker build and Push') {
+          steps {
+            sh 'docker build -t joygoswami/taco-cloud:latest .'
+            sh 'docker push joygoswami/taco-cloud:latest'
+          }
+        }
     }
 }
