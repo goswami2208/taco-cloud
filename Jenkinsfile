@@ -1,31 +1,39 @@
 pipeline {
-    agent {
-    dockerfile {
-            filename 'Dockerfile.build'
-            args '-v /root/.m2:/root/.m2'
-        }
+    agent any
+    tools {
+        maven 'maven-3.6.3'
+    }
+    environment {
+        DATE = new Date().format('yy.M')
+        TAG = "${DATE}.${BUILD_NUMBER}"
     }
     stages {
-        stage('Build') {
+        stage ('Build') {
             steps {
-                sh 'mvn -B -DskipTests clean package'
+                sh 'mvn clean package'
             }
         }
-        stage('Test') {
+        stage('Docker Build') {
             steps {
-                sh 'mvn test'
-            }
-            post {
-                always {
-                    junit 'target/surefire-reports/*.xml'
+                script {
+                    docker.build("joygoswami/taco-cloud:${TAG}")
                 }
             }
         }
-        stage ('Docker build and Push') {
-          steps {
-             sh 'docker build -t joygoswami/taco-cloud:latest .'
-             sh 'docker push joygoswami/taco-cloud:latest'
-          }
+	    stage('Pushing Docker Image to Dockerhub') {
+            steps {
+                script {
+                        docker.withRegistry('https://registry.hub.docker.com', 'my_dockerhub_id') {
+                        docker.image("joygoswami/taco-cloud:${TAG}").push()
+                        docker.image("joygoswami/taco-cloud:${TAG}").push("latest")
+                    }
+                }
+            }
+        }
+        stage('Deploy'){
+            steps {
+                sh "docker run --name taco-cloud -d -p 8081:8081 joygoswami/taco-cloud:${TAG}"
+            }
         }
     }
 }
