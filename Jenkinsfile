@@ -14,6 +14,15 @@ pipeline {
         TAG = "${DATE}.${BUILD_NUMBER}"
     }
     stages {
+
+        stage('Tooling versions') {
+              steps {
+                sh '''
+                  docker --version
+                  docker compose version
+                '''
+              }
+            }
         stage('Build') {
             steps {
                 sh 'mvn -B -DskipTests clean package'
@@ -49,6 +58,16 @@ pipeline {
         /* stage('Deploy'){
             steps {
                 sh "docker run --name taco-cloud -d -p 8081:8080 joygoswami/taco-cloud:${TAG}"
+            }
+        } */
+        /* stage('Deploy to AWS') {
+            environment {
+                DOCKER_HUB_LOGIN = credentials('docker-hub')
+            }
+            steps {
+                withAWS(credentials: 'aws-credentials', region: env.AWS_REGION) {
+                    sh './gradlew awsCfnMigrateStack awsCfnWaitStackComplete -PsubnetId=$SUBNET_ID -PdockerHubUsername=$DOCKER_HUB_LOGIN_USR -Pregion=$AWS_REGION'
+                }
             }
         } */
     }
