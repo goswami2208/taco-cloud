@@ -46,10 +46,10 @@ pipeline {
                 }
             }
         }
-        stage('Deploy'){
+        /* stage('Deploy'){
             steps {
                 sh "docker run --name taco-cloud -d -p 8081:8080 joygoswami/taco-cloud:${TAG}"
             }
-        }
+        } */
     }
 }
